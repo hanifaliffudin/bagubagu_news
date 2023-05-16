@@ -26,7 +26,7 @@ class _TopHeadlinesCategoryState extends State<TopHeadlinesCategory> {
                 } else if (state is TopHeadlinesSuccess) {
                   return ListView.builder(
                     shrinkWrap: true,
-                    itemCount: state.topHeadlinesModel.articles!.length,
+                    itemCount: state.topHeadlinesModel.articles != null ? state.topHeadlinesModel.articles!.length : 0,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       state.topHeadlinesModel.articles?.sort(
