@@ -16,7 +16,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       emit(SearchLoading());
 
       final response = await http.get(Uri.parse(
-          '${constants.AppConstants.baseUrl}$endpoint?apiKey=${constants.AppConstants.apiKey}&q=${event.keyword}&language=en&searchIn=title,description,content&sortBy=publishedAt'));
+          '${constants.AppConstants.baseUrl}$endpoint?apiKey=${constants.AppConstants.apiKey}&q=${event.keyword}&language=en&searchIn=title,description,content'));
 
       emit(
           SearchSuccess(TopHeadlinesModel.fromJson(jsonDecode(response.body))));

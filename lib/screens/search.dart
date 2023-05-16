@@ -33,8 +33,33 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             Padding(
               padding: const EdgeInsets.only(
-                  left: 10.0, right: 10, bottom: 18, top: 10),
+                  left: 10.0, right: 10, bottom: 8, top: 10),
               child: _SearchBar(),
+            ),
+            BlocBuilder<SearchBloc, SearchState>(
+              builder: (context, state) {
+                if (state is SearchLoading) {
+                  return const SizedBox();
+                }
+
+                if (state is SearchSuccess) {
+                  return state.topHeadlinesModel.totalResults == 0
+                      ? const Center(child: Text('No Results'))
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: GestureDetector(
+                              onTap: () {
+                                state.topHeadlinesModel.articles!.sort((b, a) {
+                                  return a.publishedAt!
+                                      .compareTo(b.publishedAt!);
+                                });
+                                setState(() {});
+                              },
+                              child: const Chip(label: Text('Sort by date'))),
+                        );
+                }
+                return const Text('');
+              },
             ),
             _SearchBody(),
           ],
@@ -74,9 +99,17 @@ class _SearchBarState extends State<_SearchBar> {
         decoration: InputDecoration(
             suffixIcon: IconButton(
                 onPressed: () {
-                  _searchBloc.add(
-                    GetSearchEvent(_textController.text),
-                  );
+                  if (_textController.text.isNotEmpty) {
+                    _searchBloc.add(
+                      GetSearchEvent(_textController.text),
+                    );
+                  } else {
+                    const snackBar = SnackBar(
+                      content: Text('Please fill in the search field'),
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
                 },
                 icon: const Icon(Icons.search)),
             hintText: 'Search a news',
@@ -117,7 +150,7 @@ class _SearchResults extends StatelessWidget {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.articles!.length,
+      itemCount: items.articles != null ? items.articles!.length : 0,
       itemBuilder: (BuildContext context, int index) {
         return NewsCard(
           articlesModel: items.articles![index],
